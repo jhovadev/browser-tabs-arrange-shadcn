@@ -282,7 +282,25 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex w-full items-center justify-between space-x-2 py-4">
         <div className="flex items-center justify-between space-x-2">
-          <Button onClick={() => console.log(table.getSelectedRowModel().rows)}>
+          <Button
+            onClick={() => {
+              //console.log(table.getState().rowSelection); //get the row selection state - { 1: true, 2: false, etc... }
+              //console.log(table.getSelectedRowModel().rows.); //get full client-side selected rows
+              //console.log(table.getFilteredSelectedRowModel().rows); //get filtered client-side selected rows
+              //console.log(table.getGroupedSelectedRowModel().rows); //get grouped client-side selected rows
+              const urls = table
+                .getSelectedRowModel()
+                .rows.map((row) => row.original?.url!) // Accede directamente al url de original
+                .filter((url): url is string => !!url); // Filtra undefined o null
+
+              console.log(urls); // Array con solo los URLs
+              chrome.windows.create({
+                url: urls,
+                focused: true,
+                type: "normal",
+              });
+            }}
+          >
             Load
           </Button>
           <Button

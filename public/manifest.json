@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "browser-tabs-arrange-shadcn",
+    "author": "Jhoan Vergara Arocutipa",
+    "homepage_url": "https://github.com/jhovadev/browser-tabs-arrange-shadcn",
+    "version": "0.0.0.0",
+    "description": "Browser-Extension to arrange tabs in a data-table",
+    "permissions": [
+        "scripting"
+    ],
+    "icons": {
+        "16": "icon16.png"
+    },
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "icon16.png"
+    },
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ]
+}

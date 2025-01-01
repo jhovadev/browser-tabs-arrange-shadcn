@@ -1,3 +1,6 @@
+// Providers
+import { ThemeProvider } from "@/components/theme-provider";
+
 // hooks
 import { useEffect, useState } from "react";
 
@@ -29,9 +32,9 @@ function App() {
           const tabsWithIds = windowInfo.tabs.map(
             (tab, index): Tab => ({
               id: index, // Asignamos un id único (puede ser `index` u otro identificador)
-              title: tab.title,
-              favIconUrl: tab.favIconUrl,
-              url: tab.url,
+              title: tab.title!,
+              favIconUrl: tab.favIconUrl!,
+              url: tab.url!,
             }),
           );
           setTabs(tabsWithIds);
@@ -52,13 +55,18 @@ function App() {
 
   return (
     <>
-      <main className="flex w-[700px] min-h-[600px] overflow-hidden flex-col items-center justify-center gap-4 p-4 text-center">
-        <DataTable
-          columns={columns}
-          data={tabs}
-        />
-        <Toaster />
-      </main>
+      <ThemeProvider
+        defaultTheme="dark"
+        storageKey="vite-ui-theme"
+      >
+        <main className="flex min-h-[600px] w-[700px] flex-col items-center justify-center gap-4 overflow-hidden p-4 text-center">
+          <DataTable
+            columns={columns}
+            data={tabs}
+          />
+          <Toaster />
+        </main>
+      </ThemeProvider>
     </>
   );
 }

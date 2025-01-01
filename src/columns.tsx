@@ -225,7 +225,7 @@ export const columns: ColumnDef<Tab>[] = [
       );
     },
   },
-  {
+  /*  {
     id: "actions",
     header: () => <div className="text-center">Actions</div>,
     cell: ({ row }) => {
@@ -258,5 +258,5 @@ export const columns: ColumnDef<Tab>[] = [
     },
     enableSorting: false,
     enableHiding: false,
-  },
+  }, */
 ];

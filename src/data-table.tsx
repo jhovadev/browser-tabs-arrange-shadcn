@@ -20,6 +20,7 @@ import {
   FileUp,
   HardDriveDownload,
   View,
+  CornerRightUp,
 } from "lucide-react";
 
 // Components
@@ -36,6 +37,13 @@ import {
 
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -48,6 +56,7 @@ import { useState } from "react";
 import { useStoreTabs } from "./store";
 
 import { Tab } from "./columns";
+import { ModeToggle } from "./components/mode-toggle";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -174,28 +183,47 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
         </div>
-        <div className="relative flex items-center gap-1.5">
-          <HardDriveDownload
-            onClick={handleDownload}
-            size={42}
-            className="cursor-pointer text-muted-foreground hover:text-foreground"
-          />
+        <div className="relative flex items-center gap-2.5">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <HardDriveDownload
+                  onClick={handleDownload}
+                  size={24}
+                  className="cursor-pointer text-muted-foreground hover:text-foreground"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Download</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-          <Label htmlFor="json">
-            <FileUp
-              size={24}
-              className="z-10 cursor-pointer text-muted-foreground hover:text-foreground"
-            />
-          </Label>
-          <Input
-            onChange={handleSubmit}
-            hidden
-            className="file:hidden"
-            id="json"
-            name="json"
-            accept=".json"
-            type="file"
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Label htmlFor="json">
+                  <FileUp
+                    size={24}
+                    className="z-10 cursor-pointer text-muted-foreground hover:text-foreground"
+                  />
+                </Label>
+                <Input
+                  onChange={handleSubmit}
+                  hidden
+                  className="hidden file:hidden"
+                  id="json"
+                  name="json"
+                  accept=".json"
+                  type="file"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Import</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -225,6 +253,7 @@ export function DataTable<TData, TValue>({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
+          <ModeToggle />
         </div>
       </div>
       <div className="w-full rounded-md border">
@@ -283,6 +312,9 @@ export function DataTable<TData, TValue>({
       <div className="flex w-full items-center justify-between space-x-2 py-4">
         <div className="flex items-center justify-between space-x-2">
           <Button
+            effect="expandIcon"
+            icon={CornerRightUp}
+            iconPlacement="right"
             onClick={() => {
               //console.log(table.getState().rowSelection); //get the row selection state - { 1: true, 2: false, etc... }
               //console.log(table.getSelectedRowModel().rows.); //get full client-side selected rows
@@ -304,6 +336,8 @@ export function DataTable<TData, TValue>({
             Load
           </Button>
           <Button
+            variant="outline"
+            effect="ringHover"
             onClick={
               //() => console.log(table.getSelectedRowModel().rows) //get full client-side selected rows
               () => table.toggleAllRowsSelected()

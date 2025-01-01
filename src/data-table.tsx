@@ -3,14 +3,15 @@
 import {
   ColumnDef,
   flexRender,
-  getPaginationRowModel,
-  getCoreRowModel,
   SortingState,
-  getSortedRowModel,
   ColumnFiltersState,
-  getFilteredRowModel,
   VisibilityState,
   useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getExpandedRowModel,
 } from "@tanstack/react-table";
 
 // Icons
@@ -70,7 +71,9 @@ export function DataTable<TData, TValue>({
   // States
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    id: false,
+  });
   const [rowSelection, setRowSelection] = useState({});
   const { tabs, setTabs } = useStoreTabs();
   const [globalFilter, setGlobalFilter] = useState<any>([]);
@@ -93,7 +96,9 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     // Selection
     onRowSelectionChange: setRowSelection,
-
+    // Expanded
+    getExpandedRowModel: getExpandedRowModel(),
+    
     // States
     state: {
       sorting,
@@ -114,17 +119,40 @@ export function DataTable<TData, TValue>({
   });
 
   const handleDownload = () => {
+    // Obtén los datos de la tabla
     const data = table.getRowModel().rows.map((row) => row.original);
     const jsonData = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonData], { type: "application/json" });
+
+    // Crea la URL del archivo blob
     const url = URL.createObjectURL(blob);
+
+    // Obtén la fecha y hora actuales
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}`;
+    const timeStr = `${now.getHours().toString().padStart(2, "0")}-${now.getMinutes().toString().padStart(2, "0")}-${now.getSeconds().toString().padStart(2, "0")}`;
+
+    // Nombre por defecto (puedes modificar este formato como desees)
+    const defaultName = `tabs_${dateStr}_${timeStr}`;
+
+    // Pide al usuario que ingrese un nombre para el archivo o usa el nombre por defecto
+    const fileName = prompt(
+      "Ingrese el nombre del archivo (deje vacío para usar el nombre por defecto)",
+      defaultName,
+    );
+
+    // Si el usuario no ingresa un nombre, usa el nombre por defecto
+    const finalFileName = fileName || defaultName;
+
+    // Crea un elemento de enlace y simula el clic para descargar
     const a = document.createElement("a");
     a.href = url;
-    a.download = "tabs.json";
+    a.download = finalFileName + ".json"; // Asegúrate de que tenga la extensión .json
     a.click();
+
+    // Revoca la URL para liberar recursos
     URL.revokeObjectURL(url);
   };
-
   const handleSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
@@ -183,15 +211,20 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
         </div>
-        <div className="relative flex items-center gap-2.5">
+        <div className="relative flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <HardDriveDownload
+                <Button
+                  variant="ghost"
+                  className="ml-auto"
                   onClick={handleDownload}
-                  size={24}
-                  className="cursor-pointer text-muted-foreground hover:text-foreground"
-                />
+                >
+                  <HardDriveDownload
+                    size={24}
+                    className="cursor-pointer hover:text-foreground"
+                  />
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Download</p>
@@ -202,12 +235,19 @@ export function DataTable<TData, TValue>({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Label htmlFor="json">
+                <Button
+                  variant="ghost"
+                  className="relative ml-auto"
+                >
+                  <Label
+                    htmlFor="json"
+                    className="absolute h-full w-full cursor-pointer"
+                  ></Label>
                   <FileUp
                     size={24}
-                    className="z-10 cursor-pointer text-muted-foreground hover:text-foreground"
+                    className="z-10 cursor-pointer hover:text-foreground"
                   />
-                </Label>
+                </Button>
                 <Input
                   onChange={handleSubmit}
                   hidden
@@ -224,35 +264,45 @@ export function DataTable<TData, TValue>({
             </Tooltip>
           </TooltipProvider>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="ml-auto"
-              >
-                <View size={24} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="ml-auto"
                     >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                      <View size={24} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {table
+                      .getAllColumns()
+                      .filter((column) => column.getCanHide())
+                      .map((column) => {
+                        return (
+                          <DropdownMenuCheckboxItem
+                            key={column.id}
+                            className="capitalize"
+                            checked={column.getIsVisible()}
+                            onCheckedChange={(value) =>
+                              column.toggleVisibility(!!value)
+                            }
+                          >
+                            {column.id}
+                          </DropdownMenuCheckboxItem>
+                        );
+                      })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Columns</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           <ModeToggle />
         </div>
       </div>

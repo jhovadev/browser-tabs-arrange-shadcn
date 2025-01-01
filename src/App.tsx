@@ -59,7 +59,7 @@ function App() {
         defaultTheme="dark"
         storageKey="vite-ui-theme"
       >
-        <main className="flex min-h-[600px] w-[700px] flex-col items-center justify-center gap-4 overflow-hidden p-4 text-center">
+        <main className="flex min-h-screen w-[755px] flex-col items-center justify-center gap-4 overflow-hidden p-4 text-center">
           <DataTable
             columns={columns}
             data={tabs}

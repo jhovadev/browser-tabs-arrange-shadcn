@@ -1,5 +1,5 @@
 // Icons
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Lock, CircleAlert } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -44,8 +44,8 @@ import { cn } from "./lib/utils";
 
 export type Tab = {
   id: number;
-  title: string;
   favIconUrl?: string | null;
+  title: string;
   url: string;
   isActive?: boolean;
 };
@@ -108,6 +108,26 @@ export const columns: ColumnDef<Tab>[] = [
     },
   },
   {
+    accessorKey: "favIconUrl",
+    header: "Icon",
+    cell: ({ cell }) => {
+      const iconUrl = cell.getValue<string | null>(); // Explicitly type it as string or null
+      return iconUrl ? (
+        <LazyLoadImage
+          alt="icon"
+          placeholder={
+            <LoaderCircle
+              size={24}
+              className="animate-spin"
+            />
+          }
+          src={iconUrl}
+          className="h-6 w-6 rounded-sm hover:border-2 hover:border-gray-200"
+        />
+      ) : null; // Optionally render null or a fallback icon if the URL is not provided
+    },
+  },
+  {
     accessorKey: "title",
     header: ({ column }) => {
       return (
@@ -146,26 +166,6 @@ export const columns: ColumnDef<Tab>[] = [
           </div>
         </>
       );
-    },
-  },
-  {
-    accessorKey: "favIconUrl",
-    header: "Icon",
-    cell: ({ cell }) => {
-      const iconUrl = cell.getValue<string | null>(); // Explicitly type it as string or null
-      return iconUrl ? (
-        <LazyLoadImage
-          alt="icon"
-          placeholder={
-            <LoaderCircle
-              size={24}
-              className="animate-spin"
-            />
-          }
-          src={iconUrl}
-          className="h-6 w-6 rounded-sm hover:border-2 hover:border-gray-200"
-        />
-      ) : null; // Optionally render null or a fallback icon if the URL is not provided
     },
   },
   {
